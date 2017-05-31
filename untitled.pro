@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui serialport
+
+CONFIG   += extserialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -27,11 +29,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
     mainwindow.cpp \
     qcustomplot.cpp \
+    implement.cpp
 
 
 HEADERS  += mainwindow.h \
     ljackuw.h \
     qcustomplot.h \
+
 
 
 FORMS    += mainwindow.ui
