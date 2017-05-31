@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     EDigitalOut(&w.ID,0, 0, 1, 1);
 
-
     w.show();
 
     if (!w.initialized){
@@ -17,9 +16,12 @@ int main(int argc, char *argv[])
         bool switchInit=false;
         bool mvdUp=false;
 
+        //open serial connection
+        w.serial.setPortName("COM3");
+        w.serial.open(QIODevice::ReadWrite);
+
         while(switchInit==false){
             EDigitalIn(&w.ID, 0 ,1 ,0, &switchState);
-
 
 
             qDebug("dropping motor");
@@ -37,9 +39,9 @@ int main(int argc, char *argv[])
 
         }
 
-
         w.initialized=true;
     }
+
 
     return a.exec();
 }

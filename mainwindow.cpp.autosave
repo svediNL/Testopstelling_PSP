@@ -220,7 +220,7 @@ void MainWindow::setVerticalPeriod()
     mPulsePeriod= 1000000*verticalPeriod; //convert period into milliseconds
 
     //set pulsePeriod for the vertical axis on arduino
-    talktoarduino("vertPeriod", QString::number(mPulsePeriod));
+    talktoarduino("vertPPS", QString::number(verticalPPS));
 
     qDebug("verticalPPS: %f", verticalPPS);
     qDebug("vertical mPulsePeriod %f", mPulsePeriod);

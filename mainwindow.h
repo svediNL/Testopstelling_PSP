@@ -23,6 +23,10 @@
 
 #include <QFileDialog>
 
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+#include "qextserialport-master/src/qextserialport.h"
+
 
 
 extern "C"{
@@ -73,11 +77,15 @@ public:
 
     QString logDir = "C:/Qt/logs/";
 
+    QSerialPort serial;
+
 
 
     // public functions
     float rpmtopps(float rpm, int spr);
     float mmstopps(float mmr, int spr);
+
+    void talktoarduino(QString command, QString value);
 
 
 signals:
@@ -89,15 +97,14 @@ signals:
     void verticalTimeout();
 
 
+
 private slots:
 
-    void movePlatform();
-    void incrementPlatform();
-    void directionPlatform(bool dir);
+    void closeCom();
+    void runSpeed();
 
-    void moveVertical();
-    void incrementVertical();
-    void directionVertical(bool dir);
+    void setPlatformPeriod();
+    void setVerticalPeriod();
 
     void writeDataTxt(QString fileName, QString writeData);
 
@@ -110,7 +117,13 @@ private slots:
     void on_controlTab_currentChanged(int index);
     void on_logDirButton_clicked();
 
-    void on_incButton_clicked();
+    void on_testPPS_button_clicked();
+    void on_testrunspd_button_clicked();
+    void on_testStopAll_button_clicked();
+
+    void on_rightButton_clicked();
+
+    void on_rampDoubleSpinBox_valueChanged(double arg1);
 
 private:
     Ui::MainWindow *ui;
