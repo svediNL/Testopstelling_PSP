@@ -26,28 +26,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
+LIBS += -LC:/Qt/3rd_party/U12DriverFilesOnly/ -lljackuw
+
+INCLUDEPATH += $$PWD/../drivers
+DEPENDPATH += $$PWD/../drivers
+
+
 SOURCES += main.cpp\
-    mainwindow.cpp \
-    qcustomplot.cpp \
-    implement.cpp
+    mainwindow.cpp
 
 
 HEADERS  += mainwindow.h \
     ljackuw.h \
-    qcustomplot.h \
 
 
 
 FORMS    += mainwindow.ui
 
 DISTFILES += \
-    ljackuw.lib \
-    ljackuw.dll \
-    ljackuwx.ocx \
     test.csv
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../drivers/ -lljackuw
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../drivers/ -lljackuw
-
-INCLUDEPATH += $$PWD/../drivers
-DEPENDPATH += $$PWD/../drivers

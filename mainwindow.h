@@ -2,12 +2,14 @@
 #define MAINWINDOW_H
 
 #include <math.h>
+#include <windows.h>
 #include <fstream>
 #include <iostream>
 
 #include <QMainWindow>
 #include <QString>
 #include <QDebug>
+//#include <QtTest/QTest>
 
 #include <QLabel>
 
@@ -20,6 +22,7 @@
 #include <QList>
 #include <QStringList>
 #include <QDir>
+#include <QThread>
 
 #include <QFileDialog>
 
@@ -57,8 +60,7 @@ public:
     long int outputD=0;
 
     //public parameters for platform movement
-    long int timeB;
-    long int timeC;
+
     float platformPPS;
     float platformPeriod;
     float platRPM;
@@ -67,38 +69,28 @@ public:
     bool platEnable = true;
 
     //public parameters for vertical movement
-    long int timeB1;
-    long int timeC1;
     float verticalPPS;
     float verticalPeriod;
     int asVertPos=0;
     bool vertDir= true;
     bool vertEnable= true;
 
+    QBasicTimer sensorTimer;
+
     QString logDir = "C:/Qt/logs/";
 
     QSerialPort serial;
 
-
-
     // public functions
     float rpmtopps(float rpm, int spr);
     float mmstopps(float mmr, int spr);
-
     void talktoarduino(QString command, QString value);
-
-
-signals:
-
-    //timer timeout signals
-    void atimeout();
-    void globalTimeout();
-    void platformTimeout();
-    void verticalTimeout();
-
+    void delay(int ms);
 
 
 private slots:
+    void homing();
+    void homingTest();
 
     void closeCom();
     void runSpeed();
@@ -109,6 +101,7 @@ private slots:
     void writeDataTxt(QString fileName, QString writeData);
 
     void readButton();
+    void readPressure();
 
     //standard slots
     void on_getButton_clicked();
@@ -122,23 +115,24 @@ private slots:
     void on_testStopAll_button_clicked();
 
     void on_rightButton_clicked();
-
     void on_rampDoubleSpinBox_valueChanged(double arg1);
+
+    void on_dial_sliderReleased();
+    void on_sendCommandButton_clicked();
+
+signals:
+    sensor_timeout();
 
 private:
     Ui::MainWindow *ui;
 
-    QBasicTimer timer;
-    QBasicTimer globalTimer;
-    QBasicTimer platformTimer;
-    QBasicTimer verticalTimer;
 
     QDateTime dateTime;
 
     QLabel buttonLabel;
 
 protected:
-    void timerEvent(QTimerEvent *event) override ;
+    void timerEvent(QTimerEvent *event);
 
 
 };

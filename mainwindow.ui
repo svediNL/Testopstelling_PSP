@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>922</width>
-    <height>470</height>
+    <width>957</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>90</y>
+      <y>160</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -37,7 +37,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>120</y>
+      <y>190</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -46,179 +46,11 @@
      <string>LED</string>
     </property>
    </widget>
-   <widget class="QTabWidget" name="controlTab">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>10</y>
-      <width>281</width>
-      <height>281</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">
-</string>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="speedTab">
-     <attribute name="title">
-      <string>Speed</string>
-     </attribute>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <layout class="QVBoxLayout" name="speedcontrol">
-          <item>
-           <layout class="QHBoxLayout" name="platformspeed">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Set platform speed [RPM]</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="platformSpinBox">
-              <property name="maximum">
-               <double>600.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="value">
-               <double>60.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Layer height</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="layerDoubleSpinBox">
-              <property name="value">
-               <double>5.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="runButton">
-          <property name="text">
-           <string>Run</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="stopSpeedButton">
-          <property name="text">
-           <string>STOP</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="posTab">
-     <attribute name="title">
-      <string>Position</string>
-     </attribute>
-     <widget class="QSlider" name="verticalSlider">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>10</y>
-        <width>22</width>
-        <height>161</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-     <widget class="QDial" name="dial">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>40</y>
-        <width>141</width>
-        <height>131</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QWidget" name="">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>180</y>
-        <width>121</width>
-        <height>65</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>move up</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="text">
-          <string>move down</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>10</y>
-        <width>195</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QPushButton" name="leftButton">
-         <property name="text">
-          <string>left</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="rightButton">
-         <property name="text">
-          <string>right</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </widget>
    <widget class="QSpinBox" name="hertzSpinBox">
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>150</y>
+      <y>220</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -234,7 +66,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>150</y>
+      <y>220</y>
       <width>55</width>
       <height>16</height>
      </rect>
@@ -247,7 +79,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>90</y>
+      <y>160</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -260,7 +92,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>180</y>
+      <y>250</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -273,7 +105,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>200</y>
+      <y>270</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -286,7 +118,7 @@
     <property name="geometry">
      <rect>
       <x>430</x>
-      <y>200</y>
+      <y>270</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -299,7 +131,7 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>60</y>
+      <y>130</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -312,7 +144,7 @@
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>240</y>
+      <y>310</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -324,8 +156,8 @@
    <widget class="QPushButton" name="ardtest">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>290</y>
+      <x>320</x>
+      <y>350</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -334,46 +166,7 @@
      <string>arduino test</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="testPPS_button">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>310</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>send pps</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="testrunspd_button">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>340</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>runspd</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="testStopAll_button">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>370</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>stopAll</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>590</x>
@@ -399,7 +192,7 @@
         <attribute name="title">
          <string>Platform</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -418,6 +211,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="microSteppingComboBox">
+            <property name="currentIndex">
+             <number>2</number>
+            </property>
             <item>
              <property name="text">
               <string>2</string>
@@ -497,7 +293,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -524,7 +320,7 @@
         <attribute name="title">
          <string>Vertical</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -543,6 +339,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="microSteppingComboBox_2">
+            <property name="currentIndex">
+             <number>2</number>
+            </property>
             <item>
              <property name="text">
               <string>2</string>
@@ -622,7 +421,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -648,7 +447,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -675,7 +474,7 @@
         <attribute name="title">
          <string>General</string>
         </attribute>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -701,7 +500,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>-2</x>
@@ -721,7 +520,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="rampDoubleSpinBox">
             <property name="value">
-             <double>5.000000000000000</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -732,13 +531,383 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="pressureLabel">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>330</y>
+      <width>55</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLCDNumber" name="lcdNumber">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>390</y>
+      <width>64</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>291</width>
+      <height>321</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>System Control</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTabWidget" name="controlTab">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="speedTab">
+        <attribute name="title">
+         <string>Speed</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <layout class="QVBoxLayout" name="speedcontrol">
+             <item>
+              <layout class="QHBoxLayout" name="platformspeed">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Set platform speed [RPM]</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="platformSpinBox">
+                 <property name="maximum">
+                  <double>600.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>60.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>Layer height</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="layerDoubleSpinBox">
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QPushButton" name="runButton">
+             <property name="text">
+              <string>Run</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stopSpeedButton">
+             <property name="text">
+              <string>STOP</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="posTab">
+        <attribute name="title">
+         <string>Position</string>
+        </attribute>
+        <widget class="QSlider" name="verticalSlider">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>10</y>
+           <width>22</width>
+           <height>161</height>
+          </rect>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+        <widget class="QDial" name="dial">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>40</y>
+           <width>141</width>
+           <height>131</height>
+          </rect>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::WheelFocus</enum>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>100</number>
+         </property>
+         <property name="wrapping">
+          <bool>true</bool>
+         </property>
+         <property name="notchTarget">
+          <double>3.699999999999999</double>
+         </property>
+         <property name="notchesVisible">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>180</y>
+           <width>121</width>
+           <height>65</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>move up</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>move down</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>10</y>
+           <width>195</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QPushButton" name="leftButton">
+            <property name="text">
+             <string>left</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="rightButton">
+            <property name="text">
+             <string>right</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_4">
+        <attribute name="title">
+         <string>Command</string>
+        </attribute>
+        <widget class="QPushButton" name="sendCommandButton">
+         <property name="geometry">
+          <rect>
+           <x>160</x>
+           <y>50</y>
+           <width>93</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>send</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>10</y>
+           <width>251</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="3,0">
+          <item>
+           <widget class="QComboBox" name="commandComboBox">
+            <item>
+             <property name="text">
+              <string>platPPS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>platDir</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>platPPR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>movePlat</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>vertPPS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>vertDir</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>vertPPR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>setRamp</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>stopAll</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>runspd</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>incPlat</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>incVert</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="valueLineEdit"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>340</y>
+      <width>95</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QPushButton" name="testPPS_button">
+       <property name="text">
+        <string>send pps</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="testrunspd_button">
+       <property name="text">
+        <string>runspd</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="testStopAll_button">
+       <property name="text">
+        <string>stopAll</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QPushButton" name="initializeButton">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>20</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Comic Sans MS</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>INITIATE</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>922</width>
+     <width>957</width>
      <height>26</height>
     </rect>
    </property>
