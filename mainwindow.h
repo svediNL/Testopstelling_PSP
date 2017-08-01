@@ -9,7 +9,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QDebug>
-//#include <QtTest/QTest>
+
 
 #include <QLabel>
 
@@ -85,12 +85,12 @@ public:
     float rpmtopps(float rpm, int spr);
     float mmstopps(float mmr, int spr);
     void talktoarduino(QString command, QString value);
+    int getDataArduino(QString command);
     void delay(int ms);
 
 
 private slots:
     void homing();
-    void homingTest();
 
     void closeCom();
     void runSpeed();
@@ -119,6 +119,20 @@ private slots:
 
     void on_dial_sliderReleased();
     void on_sendCommandButton_clicked();
+
+    void on_pushButton_5_clicked();
+
+    void on_enablePlatBox_toggled(bool checked);
+
+    void on_enableVertBox_toggled(bool checked);
+
+    void on_motorMmsBox_editingFinished();
+
+    void on_motorRPMBox_editingFinished();
+
+    void on_motorRunButton_clicked();
+
+    void on_motorStopButton_clicked();
 
 signals:
     sensor_timeout();

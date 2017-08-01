@@ -25,11 +25,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->platformSpinBox, SIGNAL(editingFinished()), this, SLOT(setVerticalPeriod()));
     connect(ui->layerDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(setPlatformPeriod()));
     connect(ui->layerDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(setVerticalPeriod()));
-    connect(ui->microSteppingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlatformPeriod()));
-    connect(ui->microSteppingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setVerticalPeriod()));
-    connect(ui->microSteppingComboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlatformPeriod()));
-    connect(ui->microSteppingComboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(setVerticalPeriod()));
-    connect(ui->initializeButton, SIGNAL(clicked(bool)), this, SLOT(homingTest()));
+    //connect(ui->microSteppingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlatformPeriod()));
+    //connect(ui->microSteppingComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setVerticalPeriod()));
+    //connect(ui->microSteppingComboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(setPlatformPeriod()));
+    //connect(ui->microSteppingComboBox_2, SIGNAL(currentIndexChanged(int)), this, SLOT(setVerticalPeriod()));
+    connect(ui->initializeButton, SIGNAL(clicked(bool)), this, SLOT(homing()));
 
     connect(ui->runButton, SIGNAL(clicked(bool)), this, SLOT(runSpeed()));
 //    connect(this, SIGNAL(MainWindow::closeEvent()), this, SLOT(closeCom()));
@@ -149,7 +149,7 @@ void MainWindow::setPlatformPeriod()
     // calculate steps per rotation
     steppingString= ui->microSteppingComboBox->currentText();   //get microsteping info
     microsteps= steppingString.toLatin1().toInt();  //convert string to integer
-    stepsPerRotation= microsteps*200;  //calculate amount of steps for one rotation
+    stepsPerRotation= ui->microSteppingComboBox->currentText().toLatin1().toInt();  //calculate amount of steps for one rotation
 
     platformPPS = rpmtopps(platRPM, stepsPerRotation);  //convert rpm to pulses per second
 
@@ -173,9 +173,10 @@ float MainWindow::rpmtopps(float rpm, int spr)
     // pps - pulses per second
     // rps - rotations per second
 
-    float pps, rps;
+    float pps, rps, i;
+    i = ui->platReductionBox->value();
     rps = rpm/60;
-    pps = rps*spr;
+    pps = rps*spr*i;
 
     return pps;
 }
@@ -196,7 +197,7 @@ void MainWindow::setVerticalPeriod()
     layerHeight= ui->layerDoubleSpinBox->value();   //get layerheight
     steppingString= ui->microSteppingComboBox_2->currentText(); //get microstepping value
     microSteps= steppingString.toLatin1().toInt();  //convert string to integer
-    stepsPerRotation= microSteps*200;   // calculate steps per rotation
+    stepsPerRotation= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
 
     verticalPPS= mmstopps(layerHeight,stepsPerRotation); // calcuate pulses per second related to vertical speed
 
@@ -246,18 +247,45 @@ void MainWindow::talktoarduino(QString command, QString value)
 
     qDebug()<< "datatosend" << datatosend.toUtf8();
 
-   // serial->setBaudRate(QextSerialPort::baudRate());
-    //serial.setDataBits(QSerialPort::Data8);
-    //serial->setParity(QSerialPort::NoParity);
-    //serial.setStopBits(QSerialPort::OneStop);
-    //serial.setFlowControl(QSerialPort::NoFlowControl);
+    serial.setBaudRate(2000000);
+    serial.setDataBits(QSerialPort::Data8);
+    serial.setParity(QSerialPort::NoParity);
+    serial.setStopBits(QSerialPort::OneStop);
+    serial.setFlowControl(QSerialPort::NoFlowControl);
 
 
     serial.write(datatosend.toLatin1(), datal);
     serial.flush();
 
-    QThread::msleep(10);
+    Sleep(100);
     datatosend.clear();
+
+
+}
+
+int MainWindow::getDataArduino(QString command)
+{
+    QString datatosend;
+    int a;
+    datatosend.append(command);
+    datatosend.append(";");
+    datatosend.append("0");
+    datatosend.append("~");
+    qint64 datal = datatosend.length();
+
+    qDebug()<< "datatosend" << datatosend.toUtf8();
+
+    serial.setBaudRate(2000000);
+    serial.setDataBits(QSerialPort::Data8);
+    serial.setParity(QSerialPort::NoParity);
+    serial.setStopBits(QSerialPort::OneStop);
+    serial.setFlowControl(QSerialPort::NoFlowControl);
+    serial.write(datatosend.toLatin1(), datal);
+    serial.flush();
+
+    a= serial.readAll().toInt();
+
+    return a;
 
 
 }
@@ -277,62 +305,9 @@ void MainWindow::delay(int ms)
 
 void MainWindow::homing()
 {
-        long switchState=0;
-        bool switchInit=false;
-        bool b= true;
-        bool mvdUp=false;
-
-        while(switchInit==false){
-
-            EDigitalIn(&ID, 0 ,1 ,0, &switchState);
-
-            if (b){
-
-            serial.write("platDir;1~", 10);
-            serial.flush();
-            //QThread::msleep(100);
-            serial.write("runspd;0~", 9);
-            serial.flush();
-            b=false;
-
-            }
-
-            //qDebug("dropping motor");
-
-            if (switchState>0){
-                serial.write("stopAll;0~", 10);
-                serial.flush();
-                //QThread::msleep(100);
-                talktoarduino("platDir", QString::number(0));
-
-                for (int i=0; i<10; i++){
-                    //QThread::msleep(100);
-                    talktoarduino("incPlat", QString::number(0));
-                    //qDebug("move up");
-                }
-                mvdUp=true;
-            }
-
-            if (mvdUp==true && switchState>0){ switchInit = true;}
-
-            Sleep(1);
-      }
-
-
+    talktoarduino("init","0");
 }
 
-void MainWindow::homingTest()
-{
-                talktoarduino("platDir", "0");
-                serial.flush();
-                talktoarduino("runspd","0");
-                serial.flush();
-                //delay(5000);
-                QTimer::singleShot(5000, this, SLOT(talktoarduino("slowAll","0")));
-                qDebug("eotl");
-
-
-}
 
 void MainWindow::closeCom()
 {
@@ -477,10 +452,10 @@ void MainWindow::on_rampDoubleSpinBox_valueChanged(double arg1)
 
 void MainWindow::on_dial_sliderReleased()
 {
-    double cpos=0;
+    double cpos= 0;
     double platPos = ui->dial->value();
     double microsteps = ui->microSteppingComboBox->currentText().toLatin1().toInt();
-    double PPR = microsteps*200;
+    double PPR = microsteps;
     double gotopos =(platPos/100)*PPR;
 
     if (cpos<gotopos){
@@ -501,4 +476,74 @@ void MainWindow::on_sendCommandButton_clicked()
     talktoarduino(ui->commandComboBox->currentText(), ui->valueLineEdit->text());
 
     ui->valueLineEdit->clear();
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    int a;
+    QString A;
+
+    a = getDataArduino("getPlatPos");
+    qDebug()<<a;
+}
+
+void MainWindow::on_enablePlatBox_toggled(bool checked)
+{
+    if (checked){
+        talktoarduino("enPlat", "0");qDebug("enPlat");
+    } else { talktoarduino("disPlat", "0");qDebug("disPlat");}
+}
+
+void MainWindow::on_enableVertBox_toggled(bool checked)
+{
+    if (checked){
+        talktoarduino("enVert", "0");qDebug("enVert");
+        on_motorMmsBox_editingFinished();
+    } else { talktoarduino("disVert", "0");qDebug("disVert");}
+
+}
+
+void MainWindow::on_motorMmsBox_editingFinished()
+{
+    int val;
+    int ppr;
+
+    ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
+
+    val = (ppr*(ui->motorMmsBox->value()))/(ui->pitchDoubleSpinBox->value());
+
+
+
+    talktoarduino("vertPPS",QString::number(val));
+}
+
+void MainWindow::on_motorRPMBox_editingFinished()
+{
+    int val;
+    int ppr;
+
+    ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
+
+
+    val = rpmtopps(ui->motorRPMBox->value(), ppr);
+
+
+
+    talktoarduino("platPPS",QString::number(val));
+
+}
+
+void MainWindow::on_motorRunButton_clicked()
+{
+    if ( !(ui->enablePlatBox->isChecked()) && !(ui->enableVertBox->isChecked()) ){
+
+    }else{
+
+        talktoarduino("runspd", "0");
+    }
+}
+
+void MainWindow::on_motorStopButton_clicked()
+{
+    talktoarduino("slowAll", "0");
 }

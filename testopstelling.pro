@@ -10,7 +10,7 @@ CONFIG   += extserialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-TARGET = untitled
+TARGET = testopstelling
 TEMPLATE = app
 RC_ICONS = psp.ico
 
@@ -44,5 +44,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui
 
 DISTFILES += \
-    test.csv
+    test.csv \
+    willie3.png
 

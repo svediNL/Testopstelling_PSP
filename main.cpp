@@ -7,20 +7,26 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    QSplashScreen* splash= new QSplashScreen;
-    splash->setPixmap(QPixmap("‪C:/Qt/projects/untitled/willie3.png"));
-    splash->show();
-
-
     MainWindow w;
 
-    QTimer::singleShot(2500,splash,SLOT(close()));
-    QTimer::singleShot(2500,&w,SLOT(show()));
+    //QImage splashImage("willie3.png");
+    //QPixmap pixmap;
+    //pixmap.convertFromImage(splashImage);
+    //QSplashScreen* splash= new QSplashScreen(pixmap);
+    //splash->show();
+    //QSplashScreen splash(pixmap, Qt::WindowStaysOnTopHint);
+    //splash.show();
+    //a.processEvents();
+
+    //for(int i=0;i<500000;i++){
+    //    qDebug()<<i;
+    //}
 
     EDigitalOut(&w.ID,0, 0, 1, 1);
 
     w.show();
+
+    //splash.finish(&w);
 
 //    if (!w.initialized){
 //        qDebug("initializing");
