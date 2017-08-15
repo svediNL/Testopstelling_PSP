@@ -23,6 +23,7 @@
 #include <QStringList>
 #include <QDir>
 #include <QThread>
+#include <QMessageBox>
 
 #include <QFileDialog>
 
@@ -50,6 +51,7 @@ public:
 
     bool initialized=false;
     bool endSwitch=false;
+    bool platBool= false;
 
     //public parameters for controlling IO on CB25 extrension module
     long int ID=0;
@@ -81,6 +83,13 @@ public:
 
     QSerialPort serial;
 
+    QMessageBox printMsg;
+    QMessageBox warningMsgVert;
+
+    QPushButton *msgReadyButton= printMsg.addButton(tr("Ready"), QMessageBox::AcceptRole);
+    QPushButton *msgCancelButton= printMsg.addButton(QMessageBox::Cancel);
+    QPushButton *msgOkButton= warningMsgVert.addButton(tr("Ok"), QMessageBox::AcceptRole);
+
     // public functions
     float rpmtopps(float rpm, int spr);
     float mmstopps(float mmr, int spr);
@@ -100,39 +109,49 @@ private slots:
 
     void writeDataTxt(QString fileName, QString writeData);
 
-    void readButton();
-    void readPressure();
+    //void readButton();
+    //void readPressure();
 
     //standard slots
-    void on_getButton_clicked();
-    void on_ledBox_toggled(bool checked);
-    void on_stopSpeedButton_clicked();
-    void on_controlTab_currentChanged(int index);
     void on_logDirButton_clicked();
 
-    void on_testPPS_button_clicked();
-    void on_testrunspd_button_clicked();
-    void on_testStopAll_button_clicked();
-
-    void on_rightButton_clicked();
     void on_rampDoubleSpinBox_valueChanged(double arg1);
 
-    void on_dial_sliderReleased();
+    //void on_dial_sliderReleased();
     void on_sendCommandButton_clicked();
 
-    void on_pushButton_5_clicked();
 
     void on_enablePlatBox_toggled(bool checked);
 
     void on_enableVertBox_toggled(bool checked);
 
-    void on_motorMmsBox_editingFinished();
-
-    void on_motorRPMBox_editingFinished();
-
     void on_motorRunButton_clicked();
 
     void on_motorStopButton_clicked();
+
+    void on_startPrintButton_clicked();
+
+    void on_readyPrintButton_clicked();
+
+    void on_stopPrintButton_clicked();
+
+    void on_initializeButton_clicked();
+
+    void on_rpmPrintBox_valueChanged(double arg1);
+
+    void on_layerPrintBox_valueChanged(double arg1);
+
+    void on_motorRPMBox_valueChanged(double arg1);
+
+    void on_motorMmsBox_valueChanged(double arg1);
+
+    void on_moveUpRadio_clicked();
+
+    void on_moveDownRadio_clicked();
+
+    void on_cwRadio_clicked();
+
+    void on_ccwRadio_clicked();
 
 signals:
     sensor_timeout();
