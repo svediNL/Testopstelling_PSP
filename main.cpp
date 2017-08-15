@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <QSplashScreen>
 
-
+int initPlatPPS,initVertPPS, initLayer;
 
 int main(int argc, char *argv[])
 {
@@ -25,6 +25,14 @@ int main(int argc, char *argv[])
     EDigitalOut(&w.ID,0, 0, 1, 1);
 
     w.show();
+
+    //initPlatPPS= w.rpmtopps(10, 1600);
+    //1initVertPPS= w.mmstopps(1,1600);
+    //initLayer =1;
+    //w.talktoarduino("setRamp", "500");
+   // w.talktoarduino("platPPS", QString::number(initPlatPPS));
+    //w.talktoarduino("vertPPS", QString::number(initVertPPS));
+    //w.talktoarduino("setLayer", QString::number(initLayer));
 
     //splash.finish(&w);
 
@@ -74,7 +82,4 @@ int main(int argc, char *argv[])
 //    }
 
     return a.exec();
-
-
-
 }
