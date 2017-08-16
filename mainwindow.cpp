@@ -2,14 +2,18 @@
 #include "ui_mainwindow.h"
 #include "qcustomplot.h"
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
 
-    int initPlatPPS,initVertPPS, initLayer;
+// --+--+--+--+-- MAIN FUNCTIONS --+--+--+--+-- //
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+    //This function can be used as an initialization function as it does not loop
 
     ui->setupUi(this);
+    QWidget::setWindowTitle("Polymer Science Park - 3DPrintHuge Testopstelling");
     ui->logDirLineEdit->setText(logDir);
+    updateCOM();
 
-    serial.setPortName("COM3");
+    // set up communication with arduino
+    serial.setPortName(ui->comboBoxCOMport->currentText());
     serial.open(QIODevice::ReadWrite);
     serial.setBaudRate(QSerialPort::Baud9600);
     serial.setDataBits(QSerialPort::Data8);
@@ -17,21 +21,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     serial.setStopBits(QSerialPort::OneStop);
     serial.setFlowControl(QSerialPort::NoFlowControl);
 
-    initPlatPPS= rpmtopps(10, 1600);
-    initVertPPS= mmstopps(1,1600);
-    initLayer =1;
+    platRPM= 10;
+    platformPPS= rpmtopps(platRPM, 1600);
+    verticalPPS= 1600/(ui->pitchDoubleSpinBox->value());
+    layerHeight =1;
 
     talktoarduino("setRamp", "500");
-    talktoarduino("platPPS", QString::number(initPlatPPS));
-    //talktoarduino("vertPPS", QString::number(initVertPPS));
-    talktoarduino("setLayer", QString::number(initLayer));
+    talktoarduino("platPPS", QString::number(platformPPS));
+    talktoarduino("vertPPS", QString::number(verticalPPS));
+    talktoarduino("setLayer", QString::number(layerHeight));
 
-
-    QWidget::setWindowTitle("Polymer Science Park - 3DPrintHuge Testopstelling");
-
+    // set up LabJack configurations
     trisD=3;
     DigitalIO(&ID, 0, &trisD, trisIO, &stateD, &stateIO,1, &outputD);
 
+    // set up messages
     printMsg.setText("Prepare the extruder");
     printMsg.setInformativeText("Move the extruder to the desired radius click 'ready' when extruder is in position \n\r \n\r");
     printMsg.setIcon(QMessageBox::Information);
@@ -40,26 +44,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     warningMsgVert.setInformativeText("Make sure the platform is moving in the right direction,\r\n +5V= down \r\n +0V=up");
     warningMsgVert.setIcon(QMessageBox::Warning);
 
-
+    // start timers
+    sensorTimer.start(100, this);
 
     // =-=-=-=-=-=-=-=-= CONNECT SLOTS  &   SIGNALS =-=-=-=-=-=-=-=-= //
     connect(ui->initializeButton, SIGNAL(clicked(bool)), this, SLOT(homing()));
 
+    // sync platform speed
     connect(ui->motorRPMBox, SIGNAL(valueChanged(double)), ui->rpmPrintBox, SLOT(setValue(double)));
     connect(ui->rpmPrintBox, SIGNAL(valueChanged(double)), ui->motorRPMBox, SLOT(setValue(double)));
 
+    // sync vertical speed
     connect(ui->motorMmsBox, SIGNAL(valueChanged(double)), ui->layerPrintBox, SLOT(setValue(double)));
     connect(ui->layerPrintBox, SIGNAL(valueChanged(double)), ui->motorMmsBox, SLOT(setValue(double)));
-
-    //connect(this, SIGNAL(sensor_timeout()), this, SLOT(readPressure()));
-
-
-    // start timers
-
-    sensorTimer.start(100, this);
-    //globalTimer.start(10, this);
-
-
 
 }
 
@@ -82,91 +79,13 @@ void MainWindow::timerEvent(QTimerEvent *event)
         emit sensor_timeout();
         readSetSpeed();
         readPressure();
-        //qDebug(dateTime.currentDateTime().toString().toLatin1());
-        //qDebug("sensorTimer");
+        updateCOM();
+
     }
 
 }
 
-void MainWindow::writeDataTxt(QString fileName, QString writeData)
-{
-
-    // this function prints one line into a .txt file,
-    // each line is seperated by a comma and an endline.
-    // QString fileName - desired name of the log file, date (YYYYMMDD) is appended automatically
-    // QString writeData - the line that is printed in the file
-
-    QDateTime cDateTime= QDateTime::currentDateTime();
-    QDate cDate = cDateTime.date();
-    QString cDay = QString::number(cDate.day());
-    QString cMonth = QString::number(cDate.month());
-    QString cYear = QString::number(cDate.year());
-
-    // add a 0 if a date is smaller than 10 to stick to YYYYMMDD format
-    if (cDate.day()<10) { cDay.prepend('0'); }
-    if (cDate.month()<10) { cMonth.prepend('0'); }
-
-    //generate entire file path and file name
-    QString filePath= logDir;
-    filePath.append(fileName);
-    filePath.append(cYear);
-    filePath.append(cMonth);
-    filePath.append(cDay);
-    filePath.append(".txt");
-
-    // open/create file based on desired path
-    QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)){
-
-        //connect stream to file
-        QTextStream stream(&file);
-
-        // get time data and tranform QTime into QString
-        QTime cTime = QDateTime::currentDateTime().time();
-        QString cHour = QString::number(cTime.hour());
-        QString cMinute = QString::number(cTime.minute());
-        QString cSecond = QString::number(cTime.second());
-
-        //check if time data<10 to stickto basic format HH:MM:SS
-        if(cTime.hour()<10){cHour.prepend("0");}
-        if(cTime.minute()<10){cMinute.prepend("0");}
-        if(cTime.second()<10){cSecond.prepend("0");}
-
-        //build time string
-        QString prepTime = cHour;
-        prepTime.append(":");
-        prepTime.append(cMinute);
-        prepTime.append(":");
-        prepTime.append(cSecond);
-
-
-        //place data in stream
-        stream << prepTime << ";" << writeData << ";" << endl;
-
-        //flush stream and close file
-        stream.flush();
-        file.close();
-    }
-
-}
-
-void MainWindow::readSetSpeed()
-{
-    float voltage;
-    long int overV, setRPM;
-    EAnalogIn(&ID,0,0,0,&overV,&voltage);
-
-    if(voltage<=0.01){voltage=0;}
-    if(voltage>9.95){voltage=10;}
-
-    setRPM= 150*voltage;
-
-    ui->labelSetRPM->setText(QString::number(setRPM));
-
-}
-
-
-// FUNCTIONS DIRECTLY RELATED TO PLATFORM MOTOR
+// --+--+--+--+-- PLATFORM MOTOR FUNCTIONS --+--+--+--+-- //
 void MainWindow::setPlatformPeriod()
 {
 
@@ -216,7 +135,7 @@ float MainWindow::rpmtopps(float rpm, int spr)
 }
 
 
-// FUNCTIONS DIRECTLY RELATED TO VERTICAL MOTOR
+// --+--+--+--+-- VERTICAL MOTOR FUNCTIONS --+--+--+--+-- //
 void MainWindow::setVerticalPeriod()
 {
 
@@ -233,7 +152,7 @@ void MainWindow::setVerticalPeriod()
     microSteps= steppingString.toLatin1().toInt();  //convert string to integer
     stepsPerRotation= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
 
-    verticalPPS= mmstopps(layerHeight,stepsPerRotation); // calcuate pulses per second related to vertical speed
+    verticalPPS= mmrtopps(layerHeight,stepsPerRotation); // calcuate pulses per second related to vertical speed
 
     //calculate and set timer period
     verticalPeriod = 1/verticalPPS; // calculate timer period related to appropriate frequency [in seconds]
@@ -247,7 +166,7 @@ void MainWindow::setVerticalPeriod()
 
 }
 
-float MainWindow::mmstopps(float mmr, int spr)
+float MainWindow::mmrtopps(float mmr, int spr)
 {
     //This function calculates pulses per second needed for a layerheight
     // related to the platform speed
@@ -257,19 +176,20 @@ float MainWindow::mmstopps(float mmr, int spr)
     //spd - vertical speed
     //pps - pulses per second
 
-    float rps, spd, pitch, pps;
+    float rps, spd, pitch;
+    int pps;
 
     pitch= ui->pitchDoubleSpinBox->value(); // get pitch value
+
     spd= (platRPM/60)*mmr;   //vertical speed,from layerheight related to rps
     rps= spd/pitch; //rotations per second
     pps= rps*spr;   //pulses per second
-
     return pps;
 
 }
 
 
-// ARDUINO FUNCTIONS
+// --+--+--+--+-- ARDUINO FUNCTIONS --+--+--+--+-- //
 void MainWindow::talktoarduino(QString command, QString value)
 {
     QString datatosend;
@@ -355,25 +275,6 @@ void MainWindow::runSpeed()
 
 }
 
-
-// TEST FUNCTIONS
-
-//void MainWindow::readButton()
-//{
-//    long state;
-
-//    EDigitalIn(&ID, 0 ,1 ,0, &state);
-
-//    if(state>0){
-//        ui->buttonLabel->setText("button pressed");
-//        endSwitch=true;
-//    }else {
-//        ui->buttonLabel->setText("button not pressed");
-//        endSwitch=false;
-//    }
-
-//}
-
 void MainWindow::readPressure()
 {
     float voltage;
@@ -387,52 +288,141 @@ void MainWindow::readPressure()
 
 }
 
-// ******************************** //
-// *v* standard generated slots *v* //
-// *v*v*v*v*v*v*v*vv*v*v*v*v*v*v*v* //
-
-// change log file directory
-void MainWindow::on_logDirButton_clicked()
+// --+--+--+--+-- OTHER FUNCTIONS --+--+--+--+-- //
+void MainWindow::writeDataTxt(QString fileName, QString writeData)
 {
-    logDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                               "C://", QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks);
-    ui->logDirLineEdit->setText(logDir);
+
+    // this function prints one line into a .txt file,
+    // each line is seperated by a comma and an endline.
+    // QString fileName - desired name of the log file, date (YYYYMMDD) is appended automatically
+    // QString writeData - the line that is printed in the file
+
+    QDateTime cDateTime= QDateTime::currentDateTime();
+    QDate cDate = cDateTime.date();
+    QString cDay = QString::number(cDate.day());
+    QString cMonth = QString::number(cDate.month());
+    QString cYear = QString::number(cDate.year());
+
+    // add a 0 if a date is smaller than 10 to stick to YYYYMMDD format
+    if (cDate.day()<10) { cDay.prepend('0'); }
+    if (cDate.month()<10) { cMonth.prepend('0'); }
+
+    //generate entire file path and file name
+    QString filePath= logDir;
+    filePath.append(fileName);
+    filePath.append(cYear);
+    filePath.append(cMonth);
+    filePath.append(cDay);
+    filePath.append(".txt");
+
+    // open/create file based on desired path
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)){
+
+        //connect stream to file
+        QTextStream stream(&file);
+
+        // get time data and tranform QTime into QString
+        QTime cTime = QDateTime::currentDateTime().time();
+        QString cHour = QString::number(cTime.hour());
+        QString cMinute = QString::number(cTime.minute());
+        QString cSecond = QString::number(cTime.second());
+
+        //check if time data<10 to stickto basic format HH:MM:SS
+        if(cTime.hour()<10){cHour.prepend("0");}
+        if(cTime.minute()<10){cMinute.prepend("0");}
+        if(cTime.second()<10){cSecond.prepend("0");}
+
+        //build time string
+        QString prepTime = cHour;
+        prepTime.append(":");
+        prepTime.append(cMinute);
+        prepTime.append(":");
+        prepTime.append(cSecond);
+
+
+        //place data in stream
+        stream << prepTime << ";" << writeData << ";" << endl;
+
+        //flush stream and close file
+        stream.flush();
+        file.close();
+    }
+
 }
 
-void MainWindow::on_rampDoubleSpinBox_valueChanged(double arg1)
+void MainWindow::readSetSpeed()
 {
-    int rampTime= arg1*1000;
+    float voltage;
+    long int overV, setRPM;
+    EAnalogIn(&ID,0,0,0,&overV,&voltage);
 
-    talktoarduino("setRamp", QString::number(rampTime));
+    if(voltage<=0.01){voltage=0;}
+    if(voltage>9.95){voltage=10;}
+
+    setRPM= 150*voltage;
+
+    ui->labelSetRPM->setText(QString::number(setRPM));
 
 }
 
-//void MainWindow::on_dial_sliderReleased()
-//{
-//    double cpos= 0;
-//    double platPos = ui->dial->value();
-//    double microsteps = ui->microSteppingComboBox->currentText().toLatin1().toInt();
-//    double PPR = microsteps;
-//    double gotopos =(platPos/100)*PPR;
-
-//    if (cpos<gotopos){
-//        talktoarduino("platDir", "0");
-
-//    }
-//    else{
-
-
-//    }
-//    talktoarduino("movePlat", QString::number(gotopos));
-//    cpos=platPos;
-
-//}
-
-void MainWindow::on_sendCommandButton_clicked()
+void MainWindow::updateCOM()
 {
-    talktoarduino(ui->commandComboBox->currentText(), ui->valueLineEdit->text());
+    ui->comboBoxCOMport->clear();
+    foreach(const QSerialPortInfo &portInfo, QSerialPortInfo::availablePorts()){
+        ui->comboBoxCOMport->addItem(portInfo.portName());
+    }
 
-    ui->valueLineEdit->clear();
+}
+
+
+
+// *+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+* //
+// *+*+*+*+*+*+*+* SLOTS GENERATED BY QT *+*+*+*+*+*+*+* //
+// *+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+*+* //
+
+//_-_-_-_-_-_-_- SLOTS FROM MOTOR TAB _-_-_-_-_-_-_-//
+
+void MainWindow::on_motorMmsBox_valueChanged(double arg1)
+{
+    int ppr;
+
+    ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
+    verticalPPS = (ppr*arg1)/ ( ui->pitchDoubleSpinBox->value() ) ;
+
+    talktoarduino("vertPPS",QString::number(verticalPPS));
+
+}
+
+void MainWindow::on_motorRPMBox_valueChanged(double arg1)
+{
+    int ppr;
+
+    ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
+    platformPPS = rpmtopps(arg1, ppr);
+
+    talktoarduino("platPPS",QString::number(platformPPS));
+
+}
+
+void MainWindow::on_motorRunButton_clicked()
+{
+    talktoarduino("platPPS",QString::number(platformPPS));
+    talktoarduino("vertPPS",QString::number(verticalPPS));
+
+    if (ui->moveUpRadio->isChecked()){talktoarduino("vertDir","0");}
+    else {talktoarduino("vertDir","1");}
+
+    if(ui->cwRadio->isChecked()){talktoarduino("platDir","1");}
+    else{talktoarduino("platDir","0");}
+
+    if ( (ui->enablePlatBox->isChecked()) || (ui->enableVertBox->isChecked()) )
+    { talktoarduino("runspd", "0");}
+}
+
+void MainWindow::on_motorStopButton_clicked()
+{
+    talktoarduino("slowAll", "0");
 }
 
 void MainWindow::on_enablePlatBox_toggled(bool checked)
@@ -451,89 +441,71 @@ void MainWindow::on_enableVertBox_toggled(bool checked)
 
 }
 
-
-//_-_-_-_-_-_-_- SLOTS FROM MOTOR TAB _-_-_-_-_-_-_-//
-
-void MainWindow::on_motorMmsBox_valueChanged(double arg1)
+void MainWindow::on_moveUpRadio_clicked(bool checked)
 {
-    int val;
-    int ppr;
+    if(checked){ talktoarduino("vertDir","0");}
+}
 
-    ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
-    val = (ppr*arg1) / ( ui->pitchDoubleSpinBox->value() );
+void MainWindow::on_moveDownRadio_clicked(bool checked)
+{
+    if(checked){talktoarduino("vertDir","1");}
+}
 
-    talktoarduino("vertPPS",QString::number(val));
+void MainWindow::on_cwRadio_clicked(bool checked)
+{
+    if(checked){talktoarduino("platDir","1");}
 
 }
 
-void MainWindow::on_motorRPMBox_valueChanged(double arg1)
+void MainWindow::on_ccwRadio_clicked(bool checked)
 {
-    int val;
-    int ppr;
-
-    ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
-    val = rpmtopps(arg1, ppr);
-
-    talktoarduino("platPPS",QString::number(val));
-
+    if(checked){talktoarduino("platDir","0");}
 }
 
-void MainWindow::on_motorRunButton_clicked()
-{
-    if ( !(ui->enablePlatBox->isChecked()) && !(ui->enableVertBox->isChecked()) ){
-
-    }else{
-
-        talktoarduino("runspd", "0");
-    }
-}
-
-void MainWindow::on_motorStopButton_clicked()
-{
-    talktoarduino("slowAll", "0");
-}
 
 //_-_-_-_-_-_-_- SLOTS FROM PRINT TAB _-_-_-_-_-_-_-//
 
 void MainWindow::on_rpmPrintBox_valueChanged(double arg1)
 {
-    int val;
     int ppr;
 
     ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
-    val = rpmtopps(arg1, ppr);
+    platformPPS = rpmtopps(arg1, ppr);
 
-    talktoarduino("platPPS",QString::number(val));
+    talktoarduino("platPPS",QString::number(platformPPS));
 }
 
 void MainWindow::on_layerPrintBox_valueChanged(double arg1)
 {
-    int val;
+
     int ppr;
+    layerHeight= arg1;
 
     ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
-    val = (ppr*(ui->motorMmsBox->value()))/(ui->pitchDoubleSpinBox->value());
+    verticalPPS = mmrtopps(layerHeight, ppr);
 
-    talktoarduino("vertPPS",QString::number(val));
-    talktoarduino("setLayer", QString::number(arg1) );
+    talktoarduino("vertPPS",QString::number(verticalPPS));
+    talktoarduino("setLayer", QString::number(layerHeight) );
 
 }
 
 void MainWindow::on_startPrintButton_clicked()
 {
     platBool=true;
-    talktoarduino("disVert","0");
-    talktoarduino("disPlat","0");
 
-    warningMsgVert.exec();
+    //talktoarduino("disVert","0");
+    //talktoarduino("disPlat","0");
+
+    if (ui->printContinuousButton->isChecked()){
+        talktoarduino("runspd", "0");
+    }
+    else if(ui->printStepsButton->isChecked()) {
+        talktoarduino("runprint","0");
+    }
 
     talktoarduino("enPlat", "0");
-
-    if (ui->printContinuousButton->isChecked()){talktoarduino("runspd", "0");}
-    else if(ui->printStepsButton->isChecked()) {talktoarduino("runprint","0");}
-
-    if(warningMsgVert.clickedButton()==msgOkButton){ printMsg.exec(); }
-    else{talktoarduino("slowAll","0");}
+    talktoarduino("disVert","0");
+    printMsg.exec();
 
     if(printMsg.clickedButton()== msgReadyButton ){talktoarduino("enVert", "0");}
     else if(printMsg.clickedButton() == msgCancelButton){talktoarduino("slowAll", "0");};
@@ -553,27 +525,33 @@ void MainWindow::on_stopPrintButton_clicked()
     talktoarduino("slowAll", "0");
 }
 
+
+//_-_-_-_-_-_-_- OTHER  SLOTS _-_-_-_-_-_-_-//
+
 void MainWindow::on_initializeButton_clicked()
 {
     QMessageBox::information(this, tr("WARNING"),tr("Make sure the platform is moving in the right direction,\r\n +5V= down \r\n ground=up"));
 }
 
-void MainWindow::on_moveUpRadio_clicked()
+void MainWindow::on_logDirButton_clicked()
 {
-    talktoarduino("vertDir","0");
+    logDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                               "C://", QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks);
+    ui->logDirLineEdit->setText(logDir);
 }
 
-void MainWindow::on_moveDownRadio_clicked()
+void MainWindow::on_rampDoubleSpinBox_valueChanged(double arg1)
 {
-    talktoarduino("vertDir","1");
+    int rampTime= arg1*1000;
+
+    talktoarduino("setRamp", QString::number(rampTime));
+
 }
 
-void MainWindow::on_cwRadio_clicked()
+void MainWindow::on_sendCommandButton_clicked()
 {
-    talktoarduino("platDir","1");
+    talktoarduino(ui->commandComboBox->currentText(), ui->valueLineEdit->text());
+
+    ui->valueLineEdit->clear();
 }
 
-void MainWindow::on_ccwRadio_clicked()
-{
-    talktoarduino("platDir","0");
-}
