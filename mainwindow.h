@@ -109,8 +109,10 @@ private slots:
 
     void writeDataTxt(QString fileName, QString writeData);
 
+    void readSetSpeed();
+
     //void readButton();
-    //void readPressure();
+    void readPressure();
 
     //standard slots
     void on_logDirButton_clicked();

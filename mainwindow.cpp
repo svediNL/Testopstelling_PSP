@@ -80,6 +80,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
     // Sensor read timer
     if (event->timerId()==sensorTimer.timerId()){
         emit sensor_timeout();
+        readSetSpeed();
+        readPressure();
         //qDebug(dateTime.currentDateTime().toString().toLatin1());
         //qDebug("sensorTimer");
     }
@@ -145,6 +147,21 @@ void MainWindow::writeDataTxt(QString fileName, QString writeData)
         stream.flush();
         file.close();
     }
+
+}
+
+void MainWindow::readSetSpeed()
+{
+    float voltage;
+    long int overV, setRPM;
+    EAnalogIn(&ID,0,0,0,&overV,&voltage);
+
+    if(voltage<=0.01){voltage=0;}
+    if(voltage>9.95){voltage=10;}
+
+    setRPM= 150*voltage;
+
+    ui->labelSetRPM->setText(QString::number(setRPM));
 
 }
 
@@ -357,16 +374,18 @@ void MainWindow::runSpeed()
 
 //}
 
-//void MainWindow::readPressure()
-//{
-//    float voltage;
-//    long int overV;
-//    EAnalogIn(&ID,0,0,0,&overV,&voltage);
+void MainWindow::readPressure()
+{
+    float voltage;
+    long int overV, pressure;
+    EAnalogIn(&ID,0,9,0,&overV,&voltage);
+    pressure= voltage*99;
 
-//    ui->pressureLabel->setText(QString::number(voltage));
+
+    ui->labelReadPressure->setText(QString::number(pressure));
 
 
-//}
+}
 
 // ******************************** //
 // *v* standard generated slots *v* //
