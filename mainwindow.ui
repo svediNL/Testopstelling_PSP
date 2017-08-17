@@ -44,7 +44,7 @@
          <item>
           <widget class="QTabWidget" name="tabWidget">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="printTab">
             <attribute name="title">
@@ -285,9 +285,9 @@
              <property name="geometry">
               <rect>
                <x>260</x>
-               <y>220</y>
+               <y>200</y>
                <width>128</width>
-               <height>49</height>
+               <height>84</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
@@ -311,15 +311,22 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="jogPlatButton">
+                <property name="text">
+                 <string>JOG</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
                <x>20</x>
-               <y>220</y>
+               <y>200</y>
                <width>97</width>
-               <height>51</height>
+               <height>84</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -337,6 +344,13 @@
                 </property>
                 <property name="checked">
                  <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="jogVertButton">
+                <property name="text">
+                 <string>JOG</string>
                 </property>
                </widget>
               </item>

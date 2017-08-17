@@ -82,6 +82,7 @@ public:
     QString logDir = "C:/Qt/logs/";
 
     QSerialPort serial;
+    QString pCom, cCom;
 
     QList <QSerialPortInfo> serialList;
     QStringList serialNameList;
@@ -101,8 +102,6 @@ public:
 
 
 private slots:
-    void homing();
-
     void closeCom();
     void runSpeed();
 
@@ -159,6 +158,14 @@ private slots:
     void on_cwRadio_clicked(bool checked);
 
     void on_ccwRadio_clicked(bool checked);
+
+    void on_jogVertButton_pressed();
+
+    void on_jogVertButton_released();
+
+    void on_jogPlatButton_pressed();
+
+    void on_jogPlatButton_released();
 
 signals:
     sensor_timeout();

@@ -1,3 +1,22 @@
+/* ~~~~~~~~~~~~~~~~~ Polymer Science Park Testopstelling ~~~~~~~~~~~~~~~~~ //
+ * Author(s):
+ * Sven Dicker - sdsdsven@gmail.com - 0639842173
+ *
+ * This program is part of the test setup
+ * The setup consists of 3 different components: a pc, an arduino and a labjack
+ *
+ * The pc is the master of the wholesetup, the arduino and labjack are the slaves
+ * The pc acts as a bridge between the setup and the user. The user fills in certain parameters and methods of control.
+ * Then the program calculates the desired control parameters and sends it to the slaves
+ *
+ * The arduino is responsible for controlling the motor drivers and reading the endswitches
+ *
+ * The labjack is used for sensor input
+ */
+
+
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qcustomplot.h"
@@ -11,15 +30,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QWidget::setWindowTitle("Polymer Science Park - 3DPrintHuge Testopstelling");
     ui->logDirLineEdit->setText(logDir);
     updateCOM();
-
-    // set up communication with arduino
-    serial.setPortName(ui->comboBoxCOMport->currentText());
-    serial.open(QIODevice::ReadWrite);
-    serial.setBaudRate(QSerialPort::Baud9600);
-    serial.setDataBits(QSerialPort::Data8);
-    serial.setParity(QSerialPort::NoParity);
-    serial.setStopBits(QSerialPort::OneStop);
-    serial.setFlowControl(QSerialPort::NoFlowControl);
 
     platRPM= 10;
     platformPPS= rpmtopps(platRPM, 1600);
@@ -48,15 +58,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     sensorTimer.start(100, this);
 
     // =-=-=-=-=-=-=-=-= CONNECT SLOTS  &   SIGNALS =-=-=-=-=-=-=-=-= //
-    connect(ui->initializeButton, SIGNAL(clicked(bool)), this, SLOT(homing()));
-
-    // sync platform speed
-    connect(ui->motorRPMBox, SIGNAL(valueChanged(double)), ui->rpmPrintBox, SLOT(setValue(double)));
-    connect(ui->rpmPrintBox, SIGNAL(valueChanged(double)), ui->motorRPMBox, SLOT(setValue(double)));
-
-    // sync vertical speed
-    connect(ui->motorMmsBox, SIGNAL(valueChanged(double)), ui->layerPrintBox, SLOT(setValue(double)));
-    connect(ui->layerPrintBox, SIGNAL(valueChanged(double)), ui->motorMmsBox, SLOT(setValue(double)));
 
 }
 
@@ -201,11 +202,11 @@ void MainWindow::talktoarduino(QString command, QString value)
 
     qDebug()<< "datatosend" << datatosend.toUtf8();
 
-    serial.setBaudRate(2000000);
-    serial.setDataBits(QSerialPort::Data8);
-    serial.setParity(QSerialPort::NoParity);
-    serial.setStopBits(QSerialPort::OneStop);
-    serial.setFlowControl(QSerialPort::NoFlowControl);
+//    serial.setBaudRate(2000000);
+//    serial.setDataBits(QSerialPort::Data8);
+//    serial.setParity(QSerialPort::NoParity);
+//    serial.setStopBits(QSerialPort::OneStop);
+//    serial.setFlowControl(QSerialPort::NoFlowControl);
 
 
     serial.write(datatosend.toLatin1(), datal);
@@ -255,11 +256,6 @@ void MainWindow::delay(int ms)
     }
 
     return;
-}
-
-void MainWindow::homing()
-{
-    talktoarduino("init","0");
 }
 
 void MainWindow::closeCom()
@@ -368,10 +364,33 @@ void MainWindow::readSetSpeed()
 
 void MainWindow::updateCOM()
 {
+
     ui->comboBoxCOMport->clear();
     foreach(const QSerialPortInfo &portInfo, QSerialPortInfo::availablePorts()){
         ui->comboBoxCOMport->addItem(portInfo.portName());
     }
+
+    cCom= ui->comboBoxCOMport->currentText();
+
+
+
+    if(pCom!=cCom){
+
+        serial.close();
+        qDebug()<<"port changed";
+        serial.setPortName(cCom);
+        serial.setBaudRate(2000000);
+        serial.setDataBits(QSerialPort::Data8);
+        serial.setParity(QSerialPort::NoParity);
+        serial.setStopBits(QSerialPort::OneStop);
+        serial.setFlowControl(QSerialPort::NoFlowControl);
+
+        serial.open(QIODevice::ReadWrite);
+
+        talktoarduino("greetings","0");
+        pCom=cCom;
+    }
+
 
 }
 
@@ -530,7 +549,7 @@ void MainWindow::on_stopPrintButton_clicked()
 
 void MainWindow::on_initializeButton_clicked()
 {
-    QMessageBox::information(this, tr("WARNING"),tr("Make sure the platform is moving in the right direction,\r\n +5V= down \r\n ground=up"));
+    talktoarduino("init","0");
 }
 
 void MainWindow::on_logDirButton_clicked()
@@ -555,3 +574,23 @@ void MainWindow::on_sendCommandButton_clicked()
     ui->valueLineEdit->clear();
 }
 
+void MainWindow::on_jogVertButton_pressed()
+{
+    talktoarduino("jogVert", "0");
+}
+
+void MainWindow::on_jogVertButton_released()
+{
+    talktoarduino("break","0");
+
+}
+
+void MainWindow::on_jogPlatButton_pressed()
+{
+    talktoarduino("jogPlat", "0");
+}
+
+void MainWindow::on_jogPlatButton_released()
+{
+    talktoarduino("break","0");
+}
