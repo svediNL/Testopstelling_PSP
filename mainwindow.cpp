@@ -1,3 +1,15 @@
+/*
+ *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  ~~~~~~~~~~~~~~~~  Polymer Science Park Testopstelling ~~~~~~~~~~~~~~~~
+ *  ~~~~~~~~~~~~~~~~            M A C                     ~~~~~~~~~~~~~~~~
+ *  ~~~~~~~~~~~~~~~~          18 - 8 - 2017               ~~~~~~~~~~~~~~~~
+ *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Author(s):
+ * Sven Dicker - sdsdsven@gmail.com - 0639842173
+ *
+*/
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "qcustomplot.h"
@@ -14,12 +26,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // set up communication with arduino
     serial.setPortName(ui->comboBoxCOMport->currentText());
-    serial.open(QIODevice::ReadWrite);
     serial.setBaudRate(QSerialPort::Baud9600);
     serial.setDataBits(QSerialPort::Data8);
     serial.setParity(QSerialPort::NoParity);
     serial.setStopBits(QSerialPort::OneStop);
     serial.setFlowControl(QSerialPort::NoFlowControl);
+    serial.open(QIODevice::ReadWrite);
 
     platRPM= 10;
     platformPPS= rpmtopps(platRPM, 1600);
@@ -33,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // set up LabJack configurations
     trisD=3;
-    DigitalIO(&ID, 0, &trisD, trisIO, &stateD, &stateIO,1, &outputD);
+    //DigitalIO(&ID, 0, &trisD, trisIO, &stateD, &stateIO,1, &outputD);
 
     // set up messages
     printMsg.setText("Prepare the extruder");
@@ -73,15 +85,21 @@ void MainWindow::timerEvent(QTimerEvent *event)
 //    // ******************************************** //
 
     //qDebug("EVENT");
-
+    bool flip=false;
+    //while(flip==false){
     // Sensor read timer
     if (event->timerId()==sensorTimer.timerId()){
-        emit sensor_timeout();
+        //emit sensor_timeout(true);
         readSetSpeed();
         readPressure();
         updateCOM();
 
     }
+
+    //reset signal(s)
+    //emit sensor_timeout(false);
+
+    //flip=true;
 
 }
 
@@ -201,6 +219,7 @@ void MainWindow::talktoarduino(QString command, QString value)
 
     qDebug()<< "datatosend" << datatosend.toUtf8();
 
+
     serial.setBaudRate(2000000);
     serial.setDataBits(QSerialPort::Data8);
     serial.setParity(QSerialPort::NoParity);
@@ -208,10 +227,12 @@ void MainWindow::talktoarduino(QString command, QString value)
     serial.setFlowControl(QSerialPort::NoFlowControl);
 
 
-    serial.write(datatosend.toLatin1(), datal);
-    serial.flush();
 
-    Sleep(100);
+    serial.write(datatosend.toLatin1(), datal);
+
+    serial.flush();
+    delay(100);
+
     datatosend.clear();
 
 
@@ -246,14 +267,43 @@ int MainWindow::getDataArduino(QString command)
 
 void MainWindow::delay(int ms)
 {
-    QTime ct, st;
-    ct= QTime::currentTime();
-    st= QTime::currentTime().addMSecs(ms);
+    long int cMsec, cSec, cMin, cHour;
+    long int ct, st;
+    bool b = true;
+    QTime time;
 
-    while(ct<st){
+    time= QTime::currentTime();
 
+    cMsec= time.msec();
+    cSec= time.second();
+    cMin= time.minute();
+    cHour= time.hour();
+
+    ct= cMsec+(cSec*1000)+(cMin*60000)+(cHour*3600000);
+    st= ct+ms;
+
+
+
+
+    while (b){
+        QApplication::processEvents();
+
+        time= QTime::currentTime();
+        //timer.start();
+
+        cMsec= time.msec();
+        cSec= time.second();
+        cMin= time.minute();
+        cHour= time.hour();
+
+        ct= cMsec+(cSec*1000)+(cMin*60000)+(cHour*3600000);
+
+
+        if (ct-st >= 0){
+
+            b=false;
+        }
     }
-
     return;
 }
 
@@ -277,9 +327,9 @@ void MainWindow::runSpeed()
 
 void MainWindow::readPressure()
 {
-    float voltage;
+    float voltage=0;    //voltage=0 because it is not read by labjack
     long int overV, pressure;
-    EAnalogIn(&ID,0,9,0,&overV,&voltage);
+    //EAnalogIn(&ID,0,9,0,&overV,&voltage);
     pressure= voltage*99;
 
 
@@ -353,9 +403,9 @@ void MainWindow::writeDataTxt(QString fileName, QString writeData)
 
 void MainWindow::readSetSpeed()
 {
-    float voltage;
+    float voltage=0;        //voltage=0 because it is not read by labjack
     long int overV, setRPM;
-    EAnalogIn(&ID,0,0,0,&overV,&voltage);
+    //EAnalogIn(&ID,0,0,0,&overV,&voltage);
 
     if(voltage<=0.01){voltage=0;}
     if(voltage>9.95){voltage=10;}
@@ -368,9 +418,11 @@ void MainWindow::readSetSpeed()
 
 void MainWindow::updateCOM()
 {
+    if(!ui->comboBoxCOMport->isActiveWindow()){
     ui->comboBoxCOMport->clear();
     foreach(const QSerialPortInfo &portInfo, QSerialPortInfo::availablePorts()){
         ui->comboBoxCOMport->addItem(portInfo.portName());
+    }
     }
 
 }
