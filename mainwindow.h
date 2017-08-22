@@ -49,8 +49,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    bool initialized=false;
-    bool endSwitch=false;
+    bool initialized=false;     // bool to show if program has finished initialization
 
     // ====PARAMETERS FOR LABJACK EXTENSION ==== //
     long int ID=0;
@@ -61,44 +60,51 @@ public:
     long int outputD=0;
 
     // ==== PLATFORM PARAMETERS ==== //
-    float platformPPS;
-    float platformPeriod;
-    float platRPM;
+    float platformPPS;      //motor pulses per second
+    float platformPeriod;   // motor pulse period in seconds
+    float platRPM;          //platform rotation per minute
     int asPlatPos=0;    //assumed platform position
-    bool platDir= true;
-    bool platEnable = true;
-    bool platBool= false;
+    bool platDir= true; //motor directon
+    bool platEnable = true; // sets motor enabled/disabled
+    bool platBool= false;   // used in print mode to disable platform in first stage
 
     // ==== VERTICAL PARAMETERS ==== //
-    float verticalPPS;
-    float verticalPeriod;
-    float layerHeight;
-    int asVertPos=0;
-    bool vertDir= true;
-    bool vertEnable= true;
+    float verticalPPS;  // motor pulses per second
+    float verticalPeriod;   //motor pulse period in seconds
+    float layerHeight;      //layer height during print mode in mm
+    int asVertPos=0;        // assumed vertical position
+    bool vertDir= true;     // vertical diraction
+    bool vertEnable= true;  // enables/disables the motor
 
-    QBasicTimer sensorTimer;
+    QBasicTimer sensorTimer;    //used for sampling the sensors
 
-    QString logDir = "C:/Qt/logs/";
+    QString logDir = "C:/Qt/logs/"; //path for saved log files
 
+<<<<<<< HEAD
     QSerialPort serial;
     QString pCom, cCom;
+=======
+    QSerialPort serial;     //QSerialPort for communication with Arduino
+>>>>>>> origin/master
 
-    QList <QSerialPortInfo> serialList;
-    QStringList serialNameList;
+    QList <QSerialPortInfo> serialList; //list of available serial ports
+    QStringList serialNameList;     //list of available seriaports as strings
 
-    QMessageBox printMsg;
-    QMessageBox warningMsgVert;
+    QMessageBox printMsg;       // messagebox for print massage
+    QMessageBox warningMsgVert; //messagebox for warning message
 
+    //configure meassage boxes
     QPushButton *msgReadyButton= printMsg.addButton(tr("Ready"), QMessageBox::AcceptRole);
     QPushButton *msgCancelButton= printMsg.addButton(QMessageBox::Cancel);
     QPushButton *msgOkButton= warningMsgVert.addButton(tr("Ok"), QMessageBox::AcceptRole);
 
-    float rpmtopps(float rpm, int spr);
-    float mmrtopps(float mmr, int spr);
-    void talktoarduino(QString command, QString value);
-    int getDataArduino(QString command);
-    void delay(int ms);
+    // public functons
+    float rpmtopps(float rpm, int spr);     //transform an rpm value to pulses per second
+    float mmrtopps(float mmr, int spr);     //transform mm/revolution value to pulses per second
+    void talktoarduino(QString command, QString value); //send command to arduino
+    int getDataArduino(QString command);    //send/receive info from arduin
+    void delay(int ms);     // pauses program
+
 
 
 private slots:
