@@ -402,9 +402,10 @@ void MainWindow::updateCOM()
 
 //_-_-_-_-_-_-_- SLOTS FROM MOTOR TAB _-_-_-_-_-_-_-//
 
-void MainWindow::on_motorMmsBox_valueChanged(double arg1)
+void MainWindow::on_motorMmsBox_editingFinished()
 {
     int ppr;
+    double arg1= ui->motorMmsBox->value();
 
     ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
     verticalPPS = (ppr*arg1)/ ( ui->pitchDoubleSpinBox->value() ) ;
@@ -413,12 +414,12 @@ void MainWindow::on_motorMmsBox_valueChanged(double arg1)
 
 }
 
-void MainWindow::on_motorRPMBox_valueChanged(double arg1)
+void MainWindow::on_motorRPMBox_editingFinished()
 {
     int ppr;
 
     ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
-    platformPPS = rpmtopps(arg1, ppr);
+    platformPPS = rpmtopps(ui->motorRPMBox->value(), ppr);
 
     talktoarduino("platPPS",QString::number(platformPPS));
 
@@ -455,7 +456,7 @@ void MainWindow::on_enableVertBox_toggled(bool checked)
 {
     if (checked){
         talktoarduino("enVert", "0");qDebug("enVert");
-        on_motorMmsBox_valueChanged(ui->motorMmsBox->value());
+        on_motorMmsBox_editingFinished();
     } else { talktoarduino("disVert", "0");qDebug("disVert");}
 
 }
@@ -484,21 +485,21 @@ void MainWindow::on_ccwRadio_clicked(bool checked)
 
 //_-_-_-_-_-_-_- SLOTS FROM PRINT TAB _-_-_-_-_-_-_-//
 
-void MainWindow::on_rpmPrintBox_valueChanged(double arg1)
+void MainWindow::on_rpmPrintBox_editingFinished()
 {
     int ppr;
 
     ppr= ui->microSteppingComboBox->currentText().toLatin1().toInt();   // calculate steps per rotation
-    platformPPS = rpmtopps(arg1, ppr);
+    platformPPS = rpmtopps(ui->rpmPrintBox->value(), ppr);
 
     talktoarduino("platPPS",QString::number(platformPPS));
 }
 
-void MainWindow::on_layerPrintBox_valueChanged(double arg1)
+void MainWindow::on_layerPrintBox_editingFinished()
 {
 
     int ppr;
-    layerHeight= arg1;
+    layerHeight= ui->layerPrintBox->value();
 
     ppr= ui->microSteppingComboBox_2->currentText().toLatin1().toInt();   // calculate steps per rotation
     verticalPPS = mmrtopps(layerHeight, ppr);
@@ -594,3 +595,4 @@ void MainWindow::on_jogPlatButton_released()
 {
     talktoarduino("break","0");
 }
+

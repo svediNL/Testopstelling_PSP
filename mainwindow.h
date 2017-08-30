@@ -80,12 +80,10 @@ public:
 
     QString logDir = "C:/Qt/logs/"; //path for saved log files
 
-<<<<<<< HEAD
-    QSerialPort serial;
     QString pCom, cCom;
-=======
+
     QSerialPort serial;     //QSerialPort for communication with Arduino
->>>>>>> origin/master
+
 
     QList <QSerialPortInfo> serialList; //list of available serial ports
     QStringList serialNameList;     //list of available seriaports as strings
@@ -149,14 +147,6 @@ private slots:
 
     void on_initializeButton_clicked();
 
-    void on_rpmPrintBox_valueChanged(double arg1);
-
-    void on_layerPrintBox_valueChanged(double arg1);
-
-    void on_motorRPMBox_valueChanged(double arg1);
-
-    void on_motorMmsBox_valueChanged(double arg1);
-
     void on_moveUpRadio_clicked(bool checked);
 
     void on_moveDownRadio_clicked(bool checked);
@@ -172,6 +162,14 @@ private slots:
     void on_jogPlatButton_pressed();
 
     void on_jogPlatButton_released();
+
+    void on_rpmPrintBox_editingFinished();
+
+    void on_layerPrintBox_editingFinished();
+
+    void on_motorRPMBox_editingFinished();
+
+    void on_motorMmsBox_editingFinished();
 
 signals:
     sensor_timeout();
