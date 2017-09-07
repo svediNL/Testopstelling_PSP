@@ -435,9 +435,14 @@ void MainWindow::on_motorRunButton_clicked()
 
     if(ui->cwRadio->isChecked()){talktoarduino("platDir","1");}
     else{talktoarduino("platDir","0");}
+    talktoarduino("runspd", "0");
 
-    if ( (ui->enablePlatBox->isChecked()) || (ui->enableVertBox->isChecked()) )
-    { talktoarduino("runspd", "0");}
+    if ( (ui->enablePlatBox->isChecked())){
+        talktoarduino("enPlat", "0");
+    } else { talktoarduino("disPlat", "0");}
+    if( (ui->enableVertBox->isChecked()) ){
+        talktoarduino("enVert", "0");
+    } else { talktoarduino("disVert", "0");}
 }
 
 void MainWindow::on_motorStopButton_clicked()
